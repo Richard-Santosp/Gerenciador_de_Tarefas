@@ -1,4 +1,5 @@
 import customtkinter
+from CTkMessagebox import CTkMessagebox
 
 class Cadastro:
     def __init__(self, root):
@@ -40,8 +41,15 @@ class Cadastro:
             email = self.email_entry.get()
             nome = self.nome_entry.get()
             senha = self.senha_entry.get()
-            conn = Database_connector("host", "password", "user", "database")
+            if not email or not nome or not senha:
+                return CTkMessagebox(title="Atenção", message="Preencha os campos corretamente", icon="warning")
+            conn = Database_connector("Localhost", "Fmztgmgresr1@", "root", "set_order")
             conn.conectar()
+            if conn.pesquisar_usuario(email, senha):
+                return CTkMessagebox(title="Atenção", message="Usuários já existe!", icon="warning")
             enviar_dados = conn.enviar_cadastro(email, nome, senha)
+            conn.close_connection()
+            if enviar_dados:
+                return self.voltar()
         except Exception as e:
             print(e)

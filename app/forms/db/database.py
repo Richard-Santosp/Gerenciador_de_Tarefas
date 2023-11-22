@@ -22,7 +22,7 @@ class Database_connector:
             return None
 
 
-    def validar_login(self, email, senha):
+    def pesquisar_usuario(self, email, senha):
         if not self.conn:
             if not self.conectar():
                 return None
@@ -33,16 +33,13 @@ class Database_connector:
             cursor.execute(query, params)
             resultado = cursor.fetchall()
             cursor.close()
-            self.conn.close()
-            if not email or not senha:
-                print("Preencha os campos")
-            elif not resultado:
-                print("email ou senha incorretos")
+            # self.conn.close()
             return resultado
         except mysql.connector.errors as err:
             print(err)
 
     def enviar_cadastro(self, email, nome, senha):
+        envio = None
         if not self.conn:
             if not self.conectar():
                 return None
@@ -53,6 +50,11 @@ class Database_connector:
             cursor.execute(operation, params)
             self.conn.commit()
             cursor.close()
-            self.conn.close()
+            # self.conn.close()
+            envio = True
+            return envio
         except Exception as err:
-            print('erro!!!!!: ', err)
+            print('erro!: ', err)
+
+    def close_connection(self):
+        return self.conn.close()

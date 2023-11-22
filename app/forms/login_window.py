@@ -1,4 +1,5 @@
 import customtkinter
+from CTkMessagebox import CTkMessagebox
 
 class Login:
     def __init__(self, root):
@@ -24,7 +25,7 @@ class Login:
 
     def cadastrar(self):
         try:
-            self.root.withdraw()
+            self.root.destroy()
             from cadastro_window import Cadastro
             self.root = customtkinter.CTk()
             app_cadastro = Cadastro(self.root)
@@ -37,11 +38,18 @@ class Login:
             from db.database import Database_connector
             email = self.email_entry.get()
             senha = self.senha_entry.get()
-            conn = Database_connector("host", "password", "user", "database")
+            if senha:
+                print("foi")
+            else:
+                print("não foi")
+            conn = Database_connector("Localhost", "Fmztgmgresr1@", "root", "set_order")
             conn.conectar()
-            resultado = conn.validar_login(email, senha)
-            if resultado:
-                print('bem sucedido')
+            resultado = conn.pesquisar_usuario(email, senha)
+            if not email or not senha:
+                return CTkMessagebox(title="Atenção", message="Preencha os campos", icon="warning")
+            elif not resultado:
+                CTkMessagebox(title="Atenção", message="Email ou senha invalidos", icon="warning")
+            print("Bem sucedido")
         except ImportError as e:
             print(f'Erro de importação: {e}')
 
