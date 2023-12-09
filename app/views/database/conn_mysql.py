@@ -36,7 +36,7 @@ class Database_connector:
             cursor.close()
             return resultado
         except mysql.connector.errors as err:
-            print(err)
+            print(f'Erro: {err}')
 
     # Enviando os dados passados na aba de cadastro ao banco de dados
     def enviar_cadastro(self, email, nome, senha):
@@ -54,7 +54,7 @@ class Database_connector:
             envio = True
             return envio
         except Exception as err:
-            print('erro!: ', err)
+            print(f'Erro: {err}')
 
     # realizar o fechamento da conexão
     def close_connection(self):

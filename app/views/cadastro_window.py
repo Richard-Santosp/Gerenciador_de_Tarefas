@@ -5,7 +5,13 @@ class Cadastro:
     def __init__(self, root, toplevel):
         self.root = root
         self.root.title("Área de cadastro")
-        self.root.geometry("450x270")
+        width = 450
+        height = 270
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width/2) - (width/2)
+        y = (screen_height/2) - (height/2)
+        self.root.geometry('%dx%d+%d+%d' % (width, height, x, y))
         self.root.resizable(False, False)
         self.toplevel = toplevel
 

@@ -138,8 +138,6 @@ class Painel:
             print('teste', num)
             num += 1
 
-
-
 if __name__ == '__main__':
     root = customtkinter.CTk()
     app = Painel(root)
