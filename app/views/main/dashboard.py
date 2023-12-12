@@ -1,5 +1,6 @@
 import customtkinter
 from PIL import Image
+from api_cotacoes import cambio_acoes
 
 class Painel:
     def __init__(self, root):
@@ -15,7 +16,8 @@ class Painel:
         self.root.geometry('%dx%d+%d+%d' % (width, height, x+50, y-20))
         self.root.resizable(False, False)
 
-        # Painel lateral
+
+        # Painel lateral ------------------------------------------------------------
         self.painel_lateral = customtkinter.CTkFrame(self.root, width=190, height=590,border_width=1, border_color='#95afc2', fg_color='#58acb2', corner_radius=50)
         self.painel_lateral.place(x=5, y=5)
 
@@ -28,6 +30,16 @@ class Painel:
         icone_calendario = customtkinter.CTkImage(light_image=Image.open("images/calendario.jpg"), size=(165,165))
         calendario = customtkinter.CTkButton(self.root, image=icone_calendario, text="", fg_color='#58acb2', hover_color='#417b7f', corner_radius=0, command= lambda: print('Interface do calendario'))
         calendario.place(x=15, y=150)
+
+        ######### dia e hora
+        from datetime import date
+        data = date.today()
+        self.dia = customtkinter.CTkLabel(self.painel_lateral,text=f'{data.day}/{data.month}/{data.year} -', font=("Comic Sans MS", 12), text_color='#ffffff')
+        self.dia.place(x=20, y=430)
+
+        self.horario_atual = customtkinter.CTkLabel(self.painel_lateral,text='', font=("Comic Sans MS", 12), text_color='#ffffff')
+        self.horario_atual.place(x=97, y=430)
+        self.horario()
 
         # botão de adicionar tarefa
         self.botao_add = customtkinter.CTkButton(self.painel_lateral, text='Adicionar', font=("Courier New", 12, 'bold'), text_color='#000000', fg_color='#32a8dd', hover_color='#2c8db9', corner_radius=5, width=85, border_width=1,border_color='#000000')
@@ -46,17 +58,39 @@ class Painel:
         self.botao_cancelar.place(x=95, y=490)
 
         # Botão logoff
-        self.botao_logoff = customtkinter.CTkButton(self.painel_lateral, text='Logoff', width=170, height=45, font=("Courier New", 22, 'bold'), fg_color='#e15050', hover_color='#f23838', border_spacing=5, corner_radius=25)
+        self.botao_logoff = customtkinter.CTkButton(self.painel_lateral, text='Logoff', width=170, height=45, font=("Courier New", 22, 'bold'), fg_color='#e15050', hover_color='#f23838', border_spacing=5, corner_radius=25, border_width=1, border_color='#000000')
         self.botao_logoff.place(x=10, y=525)
 
-        # cotações
-        self.cotacoes = customtkinter.CTkFrame(self.root, fg_color='#819787', width=1000, height=25, corner_radius=0)
+        # cotações------------------------------------------------------------------------------------
+        self.cotacoes = customtkinter.CTkFrame(self.root, fg_color='#000000', width=1000, height=25, corner_radius=0)
         self.cotacoes.place(x=0, y=0)
 
         self.cotacoes_titulo = customtkinter.CTkLabel(self.cotacoes, font=("Courier New", 14, 'bold'), text='Cotações atualizadas',text_color="#ffffff", fg_color='#A10000', width=200, height=24, corner_radius=15)
         self.cotacoes_titulo.place(x=-10, y=0)
+        
+        # Dolar
+        self.dolar = customtkinter.CTkLabel(self.cotacoes, text='', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.dolar.place(x=230, y=5)
+        self.dolar_variacao = customtkinter.CTkLabel(self.cotacoes, text='-----', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.dolar_variacao.place(x=340, y=5)
+        self.cotacoes_moedas(self.dolar,self.dolar_variacao, 'dolar')
 
-        # cabeçalho
+        # Euro
+        self.euro = customtkinter.CTkLabel(self.cotacoes, text='', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.euro.place(x=440, y=5)
+        self.euro_variacao = customtkinter.CTkLabel(self.cotacoes, text='-----', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.euro_variacao.place(x=540, y=5)
+        self.cotacoes_moedas(self.euro,self.euro_variacao, 'euro')
+
+        self.ibovespa = customtkinter.CTkLabel(self.cotacoes, text='', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.ibovespa.place(x=640, y=5)
+        self.cotacoes_acoes(self.ibovespa, 'ibovespa')
+
+        self.nasdaq = customtkinter.CTkLabel(self.cotacoes, text='', width=10, height=10, font=("Courier New", 14, 'bold'))
+        self.nasdaq.place(x=820, y=5)
+        self.cotacoes_acoes(self.nasdaq, 'nasdaq')
+
+        # cabeçalho--------------------------------------------------------------------------------------
         self.cabecalho = customtkinter.CTkFrame(self.root, fg_color='#5aabb3', width=795, height=118)
         self.cabecalho.place(x=200, y=25)
 
@@ -76,11 +110,11 @@ class Painel:
         self.cab_concluida = customtkinter.CTkLabel(self.cabecalho, width=192, height=105, fg_color='#C2FFC1', corner_radius=35, text="Concluida", text_color="#000000", font=("Comic Sans MS", 22, 'bold'))
         self.cab_concluida.place(x=595 , y=10)
 
-        # body
+        # body-----------------------------------------------------------------------------------------
         self.body = customtkinter.CTkFrame(self.root, fg_color='#5aabb3', width=795, height=450)
         self.body.place(x=200, y=145)
         
-        # Em andamendo
+        ######### Em andamendo
         self.celula_1 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_1.place(x=5 , y=10)
 
@@ -93,7 +127,7 @@ class Painel:
         self.celula_4 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_4.place(x=5 , y=340)
 
-        # agendada
+        ######### agendada
         self.celula_5 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_5.place(x=202 , y=10)
 
@@ -106,7 +140,7 @@ class Painel:
         self.celula_8 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_8.place(x=202 , y=340)
 
-        # Canceladas
+        ######### Canceladas
         self.celula_9 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_9.place(x=399 , y=10)
 
@@ -119,7 +153,7 @@ class Painel:
         self.celula_12= customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_12.place(x=399 , y=340)
 
-        # Concluidas
+        ######### Concluidas
         self.celula_13 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15)
         self.celula_13.place(x=595 , y=10)
 
@@ -132,11 +166,30 @@ class Painel:
         self.celula_16 = customtkinter.CTkLabel(self.body, width=192, height=105, fg_color='#ffffff', corner_radius=15, )
         self.celula_16.place(x=595 , y=340)
 
-    def teste(self):
-        num = 0
-        while num < 3:
-            print('teste', num)
-            num += 1
+    def cotacoes_moedas(self, var_moeda, var_variacao, moeda):
+        valor = cambio_acoes()
+        if valor[f'{moeda}_variacao'] > 0:
+            var_moeda.configure(text=f"{moeda} = {valor[f'{moeda}_atual']:.2f}", text_color='#12ff00')
+            var_variacao.configure(text=f"%{valor[f'{moeda}_variacao']}▲", text_color='#12ff00')
+        else:
+            var_moeda.configure(text=f"{moeda} = {valor[f'{moeda}_atual']:.2f}", text_color='#ff0000')
+            var_variacao.configure(text=f"%{valor[f'{moeda}_variacao']}▼", text_color='#ff0000')
+        self.root.after(30000, lambda: self.cotacoes_moedas(var_moeda,var_variacao , moeda))
+
+    def cotacoes_acoes(self, var_acao, acao):
+        valor = cambio_acoes()
+        if valor[acao] > 0:
+            var_acao.configure(text=f"{acao} = %{valor[acao]}▲", text_color='#12ff00')
+        else:
+            var_acao.configure(text=f"{acao} = %{valor[acao]}▼", text_color='#ff0000')
+        self.root.after(30000, lambda: self.cotacoes_acoes(var_acao, acao))
+
+    def horario(self):
+        import time
+        tempo = time.strftime("%I:%M:%S %p")
+        self.horario_atual.configure(text=tempo)
+        self.root.after(1000, self.horario)
+    
 
 if __name__ == '__main__':
     root = customtkinter.CTk()
