@@ -29,7 +29,7 @@ class Database_connector:
                 return None
         try:
             cursor =  self.conn.cursor()
-            query = 'SELECT * FROM usuarios WHERE email = %s AND senha = %s'
+            query = 'SELECT id_usuario FROM usuarios WHERE email = %s AND senha = %s'
             params = (email, senha)
             cursor.execute(query, params)
             resultado = cursor.fetchall()
@@ -38,6 +38,37 @@ class Database_connector:
         except mysql.connector.errors as err:
             print(f'Erro: {err}')
 
+    def criar_cadastro(self):
+        if not self.conn:
+            if not self.conectar():
+                return None
+        try:
+            cursor = self.conn.cursor()
+            # Criação da tabela de usuário
+            cursor.execute('''CREATE TABLE IN NOT EXIST set_order.usuarios (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        email VARCHAR(255) NOT NULL,
+                        nome VARCHAR(255) NOT NULL,
+                        senha VARCHAR(255) NOT NULL  
+            )''')
+
+            # Criação de tabela de agendamento
+            cursor.execute('''CREATE TABLE IF NOT EXIST set_order.agendamentos (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        usuario_id INT,
+                        data_inicio DATE NOT NULL,
+                        data_limite DATE NOT NULL,
+                        descricao VARCHAR(255) NOT NULL,
+                        status VARCHAR(10) NOT NULL,
+                        FOREIGN KEY (usuario_id) REFERENCES set_order.usuarios(id)
+            )''')
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            print(f'Erro ao criar tabelas: {e}')
+            return False
+
     # Enviando os dados passados na aba de cadastro ao banco de dados
     def enviar_cadastro(self, email, nome, senha):
         envio = None
@@ -45,6 +76,7 @@ class Database_connector:
             if not self.conectar():
                 return None
         try:
+            self.criar_cadastro()
             cursor = self.conn.cursor()
             operation = 'INSERT INTO set_order.usuarios (email, nome , senha) VALUES (%s, %s, %s)'
             params = (email, nome, senha)
@@ -52,10 +84,20 @@ class Database_connector:
             self.conn.commit()
             cursor.close()
             envio = True
+            self.criar_cadastro(email, nome)
             return envio
         except Exception as err:
-            print(f'Erro: {err}')
+            print(f'Erro ao criar tabela: {err}')
 
+    def agendar_tarefa(self, usuario_id, data_inicio, data_limite, descricao, status):
+        cursor = self.conn.cursor()
+        operation = 'INSERT INTO set_order.agendamentos (usuario_id, data_inicio, data_limite, descricao, status) VALUES (%s,%s,%s,%s,%s)'
+        params = (usuario_id, data_inicio, data_limite, descricao, status)
+        cursor.execute(operation, params)
+        self.conn.commit()
+        cursor.close()
+        envio = True
+        return envio
     # realizar o fechamento da conexão
     def close_connection(self):
         self.conn.close()

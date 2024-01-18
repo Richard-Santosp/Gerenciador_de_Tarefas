@@ -1,13 +1,16 @@
 import customtkinter
 from CTkMessagebox import CTkMessagebox
+from main.dashboard import Painel
+from main.api_cotacoes import cambio_acoes
 
 class Login:
-    def __init__(self, root, cadastramento=None):
+    def __init__(self, root, cadastramento=None, on_login_success=None):
         self.root = root
         self.root.title("Gerenciador de Tarefas")
         self.root.geometry("450x250")
         self.root.resizable(False, False)
         self.cadastramento = cadastramento
+        self.on_login_success = on_login_success
 
         # Formulario email
         self.email_label = customtkinter.CTkLabel(self.root, text='Email', font=("Courier New", 22))
@@ -35,7 +38,6 @@ class Login:
             # A janela do login é oculta durante o cadastro
             self.root.withdraw()
             from cadastro_window import Cadastro
-            import tkinter as tk
             self.cadastramento = customtkinter.CTkToplevel(self.root)
             app_cadastro = Cadastro(self.cadastramento, self.root)
             # Funcionalidade para destruir a janela de login caso o cadastro seja fechado com o login oculto
@@ -63,12 +65,23 @@ class Login:
             # Caso os dados não constem no banco de dados
             if not resultado:
                 return CTkMessagebox(title="Atenção", message="Email ou senha invalidos", icon="warning")
-            # Login bem sucedido (A interface do dashboard ainda será desenvolvida)
-            print('Login bem sucedido')
+            # Login bem sucedido
+            if self.on_login_success:
+                self.on_login_success(resultado)
+
+            # Feche a janela de login
+            self.root.destroy()
         except ImportError as e:
             print(f'Erro de importação: {e}')
 
 if __name__ == "__main__":
     root_login = customtkinter.CTk()
-    app = Login(root_login)
+
+    def on_login_success():
+        # Crie uma instância do Painel (dashboard) aqui
+        painel_root = customtkinter.CTk()
+        painel = Painel(painel_root)
+        painel_root.mainloop()
+
+    app = Login(root_login, on_login_success=on_login_success)
     root_login.mainloop()
