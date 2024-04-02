@@ -5,7 +5,8 @@ O projeto visa desenvolver, através de uma interface agradavel, um software par
 - Tarefas em andamentos
 - Tarefas agendadas
 - Tarefas canceladas
-- Tarefas concluidas
+- Tarefas concluidas.
+
 A dashboard também irá contar com a integração de 2 APIs:
 - Previsão do tempo
 - Cotação das principais moedas assim como da Nasdaq e Ibovespa.
