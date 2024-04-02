@@ -9,4 +9,4 @@ O projeto visa desenvolver, através de uma interface agradavel, um software par
 
 A dashboard também irá contar com a integração de 2 APIs:
 - Previsão do tempo
-- Cotação das principais moedas assim como da Nasdaq e Ibovespa.
+- Cotação das principais moedas, assim como cotações da Nasdaq e Ibovespa.
